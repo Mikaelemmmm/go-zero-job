@@ -161,7 +161,7 @@ func (l *Producer)Stop()  {
 
 另外一个Job业务逻辑
 
-```doc
+```go
 /**
 * @Description 消费者任务
 * @Author Mikael
