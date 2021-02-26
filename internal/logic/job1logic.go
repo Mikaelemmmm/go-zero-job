@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/tal-tech/go-zero/core/logx"
-	"zeroblog/app/services/job/internal/svc"
+	"job/internal/svc"
 )
 
 /**

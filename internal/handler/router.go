@@ -3,8 +3,8 @@ package handler
 import (
 	"context"
 	"github.com/tal-tech/go-zero/core/service"
-	"zeroblog/app/services/job/internal/logic"
-	"zeroblog/app/services/job/internal/svc"
+	"job/internal/logic"
+	"job/internal/svc"
 )
 
 /**

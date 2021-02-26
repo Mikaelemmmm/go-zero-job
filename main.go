@@ -9,9 +9,9 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"zeroblog/app/services/job/internal/config"
-	"zeroblog/app/services/job/internal/handler"
-	"zeroblog/app/services/job/internal/svc"
+	"job/internal/config"
+	"job/internal/handler"
+	"job/internal/svc"
 )
 
 /**

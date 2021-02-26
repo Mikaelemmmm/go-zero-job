@@ -1,7 +1,7 @@
 package svc
 
 import (
-	"zeroblog/app/services/job/internal/config"
+	"job/internal/config"
 )
 
 type ServiceContext struct {
