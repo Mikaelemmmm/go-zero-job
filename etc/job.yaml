@@ -1,0 +1,6 @@
+Name: job
+
+Log:
+  ServiceName: job
+  Level: info
+
