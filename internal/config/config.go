@@ -1,7 +1,9 @@
 package config
 
 import (
+	"github.com/tal-tech/go-queue/dq"
 	"github.com/tal-tech/go-zero/core/service"
+
 )
 
 /**
@@ -11,4 +13,5 @@ import (
 
 type Config struct {
 	service.ServiceConf
+	DqConf dq.DqConf
 }
