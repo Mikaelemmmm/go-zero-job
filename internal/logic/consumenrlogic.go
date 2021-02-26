@@ -1,16 +1,19 @@
+/**
+* @Description 消费者任务
+* @Author Mikael
+* @Email 13247629622@163.com
+* @Date 2021/1/18 12:05
+* @Version 1.0
+**/
 package logic
 
 import (
 	"context"
 	"github.com/tal-tech/go-zero/core/logx"
+	"github.com/tal-tech/go-zero/core/threading"
 	"job/internal/svc"
-	"fmt"
 )
 
-/**
-* @Description 消费者
-* @Version 1.0
-**/
 type Consumer struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
@@ -26,14 +29,15 @@ func NewConsumerLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Consumer
 }
 
 func (l *Consumer)Start()  {
-	fmt.Printf("start consumer \n")
+	logx.Infof("start consumer \n")
 
-	l.svcCtx.Consumer.Consume(func(body []byte) {
-		fmt.Printf("consumer job  %s \n" ,string(body))
+	threading.GoSafe(func() {
+		l.svcCtx.Consumer.Consume(func(body []byte) {
+			logx.Infof("consumer job  %s \n" ,string(body))
+		})
 	})
-
 }
 
 func (l *Consumer)Stop()  {
-	fmt.Printf("stop consumer \n")
+	logx.Infof("stop consumer \n")
 }
