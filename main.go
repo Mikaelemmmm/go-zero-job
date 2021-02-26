@@ -33,8 +33,6 @@ func main() {
 	conf.MustLoad(*configFile, &c)
 	ctx := svc.NewServiceContext(c)
 
-	fmt.Printf("ctx : %v",ctx)
-
 	//注册job
 	group := service.NewServiceGroup()
 	handler.RegisterJob(ctx,group)
@@ -48,7 +46,7 @@ func main() {
 		switch s {
 		case syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT:
 			fmt.Printf("stop group")
-			//group.Stop()
+			group.Stop()
 			logx.Info("job exit")
 			time.Sleep(time.Second)
 			return
