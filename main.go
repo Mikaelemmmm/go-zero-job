@@ -18,7 +18,7 @@ import (
 * @Description TODO
 * @Version 1.0
 **/
-var configFile = flag.String("f", "/Users/seven/Developer/goenv/zeroblog/app/services/job/etc/job.yaml", "the config file")
+var configFile = flag.String("f", "/Users/seven/Developer/goenv/未命名文件夹/job/etc/job.yaml", "the config file")
 
 func main() {
 	flag.Parse()

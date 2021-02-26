@@ -2,10 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a8a971b0-e3c3-474c-95ed-e67cc3f94e59" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/internal/handler/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/handler/router.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/logic/job1logic.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/logic/job1logic.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/logic/job2logic.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/logic/job2logic.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/svc/servicecontext.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/svc/servicecontext.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -46,6 +42,35 @@
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
+  <component name="RunManager">
+    <configuration default="true" type="ArquillianTestNG" factoryName="" nameIsGenerated="true">
+      <option name="arquillianRunConfiguration">
+        <value>
+          <option name="containerStateName" value="" />
+        </value>
+      </option>
+      <option name="TEST_OBJECT" value="CLASS" />
+      <properties />
+      <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="job" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="FILE" />
+      <filePath value="$PROJECT_DIR$/main.go" />
+      <package value="job" />
+      <directory value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Go Build.go build main.go" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -55,7 +80,7 @@
       <option name="presentableId" value="Default" />
       <updated>1614309666380</updated>
       <workItem from="1614309667929" duration="87000" />
-      <workItem from="1614309767366" duration="54000" />
+      <workItem from="1614309767366" duration="74000" />
     </task>
     <servers />
   </component>
