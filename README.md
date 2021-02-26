@@ -9,7 +9,7 @@
 
 我们主要说一下dq，kq使用也一样的，只是依赖底层不同，如果没使用过beanstalkd，没接触过beanstalkd的可以先google一下，使用起来还是挺容易的。
 
-etc/job.yaml
+etc/job.yaml : 配置文件
 
 ```yaml
 Name: job
@@ -18,7 +18,7 @@ Log:
   ServiceName: job
   Level: info
 
-#dq 配置
+#dq依赖Beanstalks、redis ，Beanstalks配置、redis配置
 DqConf:
   Beanstalks:
     - Endpoint: 127.0.0.1:7771
@@ -32,13 +32,30 @@ DqConf:
 
 
 
-Internal/config/config.go
+Internal/config/config.go ：解析dq对应etc/*.yaml配置
 
 ```go
+/**
+* @Description 配置文件
+* @Author Mikael
+* @Email 13247629622@163.com
+* @Date 2021/1/18 12:05
+* @Version 1.0
+**/
+
+package config
+
+import (
+	"github.com/tal-tech/go-queue/dq"
+	"github.com/tal-tech/go-zero/core/service"
+
+)
+
 type Config struct {
 	service.ServiceConf
 	DqConf dq.DqConf
 }
+
 ```
 
 
@@ -46,36 +63,57 @@ type Config struct {
 Handler/router.go : 负责注册多任务
 
 ```go
+/**
+* @Description 注册job
+* @Author Mikael
+* @Email 13247629622@163.com
+* @Date 2021/1/18 12:05
+* @Version 1.0
+**/
+package handler
+
+import (
+	"context"
+	"github.com/tal-tech/go-zero/core/service"
+	"job/internal/logic"
+	"job/internal/svc"
+)
+
 func RegisterJob(serverCtx *svc.ServiceContext,group *service.ServiceGroup)  {
 
 	group.Add(logic.NewProducerLogic(context.Background(),serverCtx))
 	group.Add(logic.NewConsumerLogic(context.Background(),serverCtx))
 
 	group.Start()
+
 }
 ```
 
 
 
-Logic:
+ProducerLogic: 其中一个job业务逻辑
 
 ```go
+/**
+* @Description 生产者任务
+* @Author Mikael
+* @Email 13247629622@163.com
+* @Date 2021/1/18 12:05
+* @Version 1.0
+**/
 package logic
 
 import (
 	"context"
-	"fmt"
 	"github.com/tal-tech/go-queue/dq"
 	"github.com/tal-tech/go-zero/core/logx"
+	"github.com/tal-tech/go-zero/core/threading"
 	"job/internal/svc"
 	"strconv"
 	"time"
 )
 
-/**
-* @Description 生产者
-* @Version 1.0
-**/
+
 
 type Producer struct {
 	ctx    context.Context
@@ -92,49 +130,54 @@ func NewProducerLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Producer
 }
 
 func (l *Producer)Start()  {
-	fmt.Printf("start  Producer \n")
 
-	producer := dq.NewProducer([]dq.Beanstalk{
-		{
-			Endpoint: "localhost:7771",
-			Tube:     "tube1",
-		},
-		{
-			Endpoint: "localhost:7772",
-			Tube:     "tube2",
-		},
-	})
-	for i := 1000; i < 1005; i++ {
-		_, err := producer.Delay([]byte(strconv.Itoa(i)), time.Second * 1)
-		if err != nil {
-			fmt.Println(err)
+	logx.Infof("start  Producer \n")
+	threading.GoSafe(func() {
+		producer := dq.NewProducer([]dq.Beanstalk{
+			{
+				Endpoint: "localhost:7771",
+				Tube:     "tube1",
+			},
+			{
+				Endpoint: "localhost:7772",
+				Tube:     "tube2",
+			},
+		})
+		for i := 1000; i < 1005; i++ {
+			_, err := producer.Delay([]byte(strconv.Itoa(i)), time.Second * 1)
+			if err != nil {
+				logx.Error(err)
+			}
 		}
-	}
+	})
 }
 
 func (l *Producer)Stop()  {
-	fmt.Printf("stop Producer \n")
+	logx.Infof("stop Producer \n")
 }
 
 
 ```
 
-
+另外一个Job业务逻辑
 
 ```doc
+/**
+* @Description 消费者任务
+* @Author Mikael
+* @Email 13247629622@163.com
+* @Date 2021/1/18 12:05
+* @Version 1.0
+**/
 package logic
 
 import (
 	"context"
 	"github.com/tal-tech/go-zero/core/logx"
+	"github.com/tal-tech/go-zero/core/threading"
 	"job/internal/svc"
-	"fmt"
 )
 
-/**
-* @Description 消费者
-* @Version 1.0
-**/
 type Consumer struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
@@ -150,16 +193,17 @@ func NewConsumerLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Consumer
 }
 
 func (l *Consumer)Start()  {
-	fmt.Printf("start consumer \n")
+	logx.Infof("start consumer \n")
 
-	l.svcCtx.Consumer.Consume(func(body []byte) {
-		fmt.Printf("consumer job  %s \n" ,string(body))
+	threading.GoSafe(func() {
+		l.svcCtx.Consumer.Consume(func(body []byte) {
+			logx.Infof("consumer job  %s \n" ,string(body))
+		})
 	})
-
 }
 
 func (l *Consumer)Stop()  {
-	fmt.Printf("stop consumer \n")
+	logx.Infof("stop consumer \n")
 }
 ```
 
@@ -168,6 +212,13 @@ func (l *Consumer)Stop()  {
 svc/servicecontext.go
 
 ```go
+/**
+* @Description 配置
+* @Author Mikael
+* @Email 13247629622@163.com
+* @Date 2021/1/18 12:05
+* @Version 1.0
+**/
 package svc
 
 import (
@@ -194,52 +245,63 @@ func NewServiceContext(c config.Config) *ServiceContext {
 main.go启动文件
 
 ```go
+/**
+* @Description 启动文件
+* @Author Mikael
+* @Email 13247629622@163.com
+* @Date 2021/1/18 12:05
+* @Version 1.0
+**/
 package main
 
 import (
 	"flag"
-	"github.com/tal-tech/go-zero/core/conf"
-	"github.com/tal-tech/go-zero/core/service"
-	"github.com/tal-tech/go-zero/core/threading"
 	"fmt"
-	"os"
-	"os/signal"
-	"syscall"
+	"github.com/tal-tech/go-zero/core/conf"
+	"github.com/tal-tech/go-zero/core/logx"
+	"github.com/tal-tech/go-zero/core/service"
 	"job/internal/config"
 	"job/internal/handler"
 	"job/internal/svc"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
-/**
-* @Description TODO
-* @Version 1.0
-**/
+
 var configFile = flag.String("f", "etc/job.yaml", "the config file")
 
 func main() {
 	flag.Parse()
 
+	//配置
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
 	ctx := svc.NewServiceContext(c)
 
+	//注册job
 	group := service.NewServiceGroup()
-	ch := make(chan os.Signal)
-	signal.Notify(ch, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
-	threading.GoSafe(func() {
-		for s := range ch {
-			switch s {
-			case syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT:
-				group.Stop()
-			}
-		}
-	})
-
 	handler.RegisterJob(ctx,group)
 
-	//阻塞直至有信号传入
-	s := <-ch
-	fmt.Println("退出job..", s)
+	//捕捉信号
+	ch := make(chan os.Signal)
+	signal.Notify(ch, syscall.SIGHUP, syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT)
+	for {
+		s := <-ch
+		logx.Info("get a signal %s", s.String())
+		switch s {
+		case syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT:
+			fmt.Printf("stop group")
+			group.Stop()
+			logx.Info("job exit")
+			time.Sleep(time.Second)
+			return
+		case syscall.SIGHUP:
+		default:
+			return
+		}
+	}
 }
 ```
 
